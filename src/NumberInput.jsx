@@ -1,45 +1,52 @@
-import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+import {z } from 'zod';
+
+const SCHEMA = z.object({
+  phoneNumber: z.string().refine((value) => isValidPhoneNumber(value), "Invalid!")
+});
 
 function NumberInput() {
-  const [phone, setPhone] = useState('');
-  const [error, setError] = useState('');
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid, errors }
+  } = useForm({
+    resolver: zodResolver(SCHEMA)
+  });
 
-  const handleOnChange = (value) => {
-    setPhone(value);
-    setError(''); 
-  };
-
-  const handleSubmit = () => {
-    if (phone && isValidPhoneNumber(phone)) {
-      console.log('Phone number is valid!');
-    } else {
-      setError('Please enter a valid phone number.');
-    }
+  const onSubmit = (formData) => {
+    console.log('formData', formData);
   };
 
   return (
     <div style={{ maxWidth: '300px', margin: '0 auto' }}>
       <h2>Phone Number Input</h2>
-      
-      <PhoneInput
-        placeholder="Enter phone number"
-        value={phone}
-        onChange={handleOnChange}
-        defaultCountry="US"
-        limitMaxLength
-        international
+      <Controller
+        control={control}
+        name="phoneNumber"
+        render={({ field: { value, onChange }}) => (
+          <PhoneInput
+            defaultCountry="AE"
+            placeholder="Enter phone number"
+            value={value}
+            onChange={onChange}
+            limitMaxLength
+            international
+          />
+        )}
       />
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {errors && <p style={{ color: 'red' }}>{errors?.phoneNumber?.message}</p>}
 
-      <button type="button" onClick={handleSubmit} style={{ marginTop: '1rem' }}>
+      <button type="button" style={{ marginTop: '1rem' }} disabled={!isValid} onClick={handleSubmit(onSubmit)}>
         Submit
       </button>
 
       <p style={{ marginTop: '1rem' }}>
-        <strong>Current Value:</strong> {phone || 'None'}
       </p>
     </div>
   );
