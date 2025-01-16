@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-import NumberInput from './NumberInput';
+import PhoneForm from './NumberInput';
 
 function App() {
   return (
     <div>
-      <NumberInput />
+      <PhoneForm />
     </div>
   );
 }
